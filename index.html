@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>黒狼 機能一覧</title>
+<meta name="description" content="黒狼の規範システムの全体図。フォルダ・規範の層・フック・黒狼回線・想起・道具・CIまで。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="黒狼 機能一覧">
+<meta property="og:description" content="黒狼の規範システムの全体図。フォルダ・規範の層・フック・黒狼回線・想起・道具・CIまで。">
+<meta property="og:url" content="https://hadekait.github.io/kokuro/">
+<meta property="og:image" content="https://hadekait.github.io/kokuro/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07090d; --bg2:#0c1017; --panel:#10151e; --panel2:#151c28; --line:#1f2835; --line2:#2a3647;
+  --ink:#e7edf5; --ink2:#a9b6c7; --ink3:#6b7a8f;
+  --acc:#5ee6d0; --acc2:#3aa6ff; --warn:#f5b94a; --stop:#ff5d6c; --ok:#7ee787; --violet:#b69cff;
+  --glow:0 0 0 1px rgba(94,230,208,.25), 0 10px 40px -10px rgba(94,230,208,.25);
+  --grid:rgba(94,230,208,.045);
+  --shadow:0 20px 60px -20px rgba(0,0,0,.7);
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#f3f5f8; --bg2:#e9edf2; --panel:#ffffff; --panel2:#f6f8fb; --line:#dde3ea; --line2:#c9d2dd;
+  --ink:#0f1722; --ink2:#3b4a5c; --ink3:#6c7b8e;
+  --acc:#0b9e8a; --acc2:#1f6fd1; --warn:#b97800; --stop:#d62f45; --ok:#2b8a3e; --violet:#6b4fd6;
+  --glow:0 0 0 1px rgba(11,158,138,.25), 0 10px 30px -12px rgba(11,158,138,.25);
+  --grid:rgba(15,23,34,.045);
+  --shadow:0 18px 40px -22px rgba(15,23,34,.35);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#f3f5f8; --bg2:#e9edf2; --panel:#ffffff; --panel2:#f6f8fb; --line:#dde3ea; --line2:#c9d2dd;
+    --ink:#0f1722; --ink2:#3b4a5c; --ink3:#6c7b8e;
+    --acc:#0b9e8a; --acc2:#1f6fd1; --warn:#b97800; --stop:#d62f45; --ok:#2b8a3e; --violet:#6b4fd6;
+    --glow:0 0 0 1px rgba(11,158,138,.25), 0 10px 30px -12px rgba(11,158,138,.25);
+    --grid:rgba(15,23,34,.045);
+    --shadow:0 18px 40px -22px rgba(15,23,34,.35);
+    color-scheme:light;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Zen Kaku Gothic New",system-ui,-apple-system,"Hiragino Sans","Yu Gothic UI",sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden;word-break:auto-phrase;overflow-wrap:anywhere}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:48px 48px;mask-image:radial-gradient(ellipse at 50% 0%,#000 30%,transparent 80%)}
+a{color:var(--acc);text-decoration:none}
+code,.mono{font-family:"JetBrains Mono",ui-monospace,Consolas,monospace;font-size:.86em}
+code{background:var(--panel2);border:1px solid var(--line);padding:.05em .4em;border-radius:5px;color:var(--ink2);word-break:normal;overflow-wrap:anywhere;display:inline-block;max-width:100%;line-height:1.5}
+.nw code{white-space:normal}
+.nw{white-space:nowrap}
+.sen{display:inline-block;max-width:100%}
+.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 24px}
+@media (max-width:640px){.wrap{padding:0 16px}}
+
+/* nav */
+header.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4);
+  background:color-mix(in srgb,var(--bg) 72%,transparent);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:18px;height:60px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.08em;white-space:nowrap}
+.brand svg{width:26px;height:26px}
+.brand small{font-family:"JetBrains Mono",monospace;font-weight:400;color:var(--ink3);font-size:11px;letter-spacing:.14em}
+.links{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0}
+.links::-webkit-scrollbar{display:none}
+.links a{color:var(--ink2);font-size:13px;padding:6px 10px;border-radius:8px;white-space:nowrap;transition:.2s}
+.links a:hover,.links a.on{color:var(--ink);background:var(--panel2)}
+.links a .n{font-family:"JetBrains Mono",monospace;color:var(--acc);font-size:11px;margin-right:4px}
+.tools{display:flex;gap:8px;align-items:center}
+.search{position:relative}
+.search input{width:190px;background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:9px;padding:7px 30px 7px 32px;font:inherit;font-size:13px;outline:none;transition:.2s}
+.search input:focus{border-color:var(--acc);box-shadow:var(--glow);width:240px}
+.search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--ink3)}
+.search kbd{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--ink3);border:1px solid var(--line2);border-radius:4px;padding:0 5px}
+.iconbtn{width:34px;height:34px;display:grid;place-items:center;border-radius:9px;background:var(--panel);border:1px solid var(--line);color:var(--ink2);cursor:pointer;transition:.2s}
+.iconbtn:hover{color:var(--acc);border-color:var(--acc)}
+.iconbtn svg{width:16px;height:16px}
+@media (max-width:860px){.links{display:none}.search input{width:150px}.search input:focus{width:170px}}
+@media (max-width:520px){.brand small{display:none}.search kbd{display:none}.search input{width:118px;padding-right:10px}.search input:focus{width:150px}.nav .wrap{gap:10px}}
+@media (max-width:760px){.topo,.const{overflow-x:auto;-webkit-overflow-scrolling:touch}.topo svg{min-width:760px}.const svg{min-width:660px}}
+
+/* hero */
+.hero{position:relative;min-height:88vh;display:flex;align-items:center;overflow:hidden;border-bottom:1px solid var(--line)}
+#vortex{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.hero::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 70% 50%,transparent 35%,var(--bg) 92%),linear-gradient(90deg,var(--bg) 0%,color-mix(in srgb,var(--bg) 55%,transparent) 38%,transparent 60%);pointer-events:none}
+.hero .wrap{z-index:2;padding-top:40px;padding-bottom:60px}
+.eyebrow{font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.28em;color:var(--acc);display:flex;align-items:center;gap:10px}
+.eyebrow::before{content:"";width:28px;height:1px;background:var(--acc)}
+h1{font-size:clamp(44px,8.4vw,112px);line-height:1.02;margin:18px 0 14px;font-weight:900;letter-spacing:-.01em}
+h1 .grad{background:linear-gradient(100deg,var(--ink) 0%,var(--acc) 55%,var(--acc2) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{max-width:640px;color:var(--ink2);font-size:clamp(15px,1.6vw,18px)}
+.lede,.quote{word-break:keep-all;overflow-wrap:anywhere}
+.lede b{color:var(--ink)}
+.quote{margin-top:26px;max-width:600px;border-left:2px solid var(--acc);padding:4px 0 4px 16px;color:var(--ink3);font-size:14px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:44px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden;max-width:880px;box-shadow:var(--shadow)}
+.stat{background:color-mix(in srgb,var(--panel) 88%,transparent);padding:18px 18px 16px;backdrop-filter:blur(6px)}
+.stat .v{font-family:"JetBrains Mono",monospace;font-size:clamp(24px,3vw,34px);font-weight:600;color:var(--ink);line-height:1.1}
+.stat .v .u{font-size:.5em;color:var(--ink3);margin-left:3px}
+.stat .k{font-size:12px;color:var(--ink3);margin-top:4px}
+@media (max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}}
+.scope{margin-top:14px;font-size:12px;color:var(--ink3);max-width:880px}
+.scope .tag{display:inline-block;border:1px solid var(--warn);color:var(--warn);border-radius:99px;padding:0 8px;margin-right:6px;font-size:11px}
+
+/* sections */
+section.sec{position:relative;padding:100px 0 40px}
+.sec-head{display:grid;grid-template-columns:auto 1fr;gap:10px 22px;align-items:end;margin-bottom:34px}
+.sec-no{font-family:"JetBrains Mono",monospace;font-size:64px;line-height:.9;color:transparent;-webkit-text-stroke:1px var(--line2);font-weight:600}
+.sec-head h2{margin:0;font-size:clamp(26px,3.4vw,38px);font-weight:900;letter-spacing:.01em}
+.sec-head p{grid-column:2;margin:0;color:var(--ink2);max-width:760px}
+@media (max-width:640px){.sec-head{grid-template-columns:1fr}.sec-no{font-size:44px}.sec-head p{grid-column:1}}
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+@media (max-width:980px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+.card{position:relative;background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px;transition:border-color .25s,transform .25s,box-shadow .25s;overflow:hidden}
+.card::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;opacity:0;transition:.3s;
+  background:radial-gradient(360px circle at var(--mx,50%) var(--my,0%),var(--acc),transparent 60%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.card:hover::before{opacity:1}
+.card h3{margin:0 0 6px;font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card p{margin:0;color:var(--ink2);font-size:14px}
+.card .src{margin-top:12px;font-size:12px;color:var(--ink3);display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.card .src::before{content:"正本";font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--acc);border:1px solid color-mix(in srgb,var(--acc) 40%,transparent);border-radius:4px;padding:0 5px}
+.ico{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:color-mix(in srgb,var(--acc) 12%,transparent);color:var(--acc);margin-bottom:12px}
+.ico svg{width:18px;height:18px}
+.pill{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.06em;padding:1px 8px;border-radius:99px;border:1px solid var(--line2);color:var(--ink3);font-weight:400}
+.pill.stop{border-color:var(--stop);color:var(--stop)}
+.pill.go{border-color:color-mix(in srgb,var(--ok) 60%,transparent);color:var(--ok)}
+.pill.warn{border-color:var(--warn);color:var(--warn)}
+.pill.acc{border-color:var(--acc);color:var(--acc)}
+.pill.vio{border-color:var(--violet);color:var(--violet)}
+
+.hit{outline:2px solid var(--warn);outline-offset:2px}
+.dim{opacity:.18;filter:saturate(.3)}
+.searchinfo{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(80px);z-index:60;background:var(--panel);border:1px solid var(--warn);color:var(--ink);padding:8px 16px;border-radius:99px;font-size:13px;box-shadow:var(--shadow);transition:.3s;pointer-events:none}
+.searchinfo.on{transform:translateX(-50%) translateY(0)}
+
+/* 01 topology */
+.topo{background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:18px;overflow:hidden}
+.topo svg{width:100%;height:auto;display:block}
+.topo .lbl{font-family:"Zen Kaku Gothic New",sans-serif;font-size:13px;fill:var(--ink)}
+.topo .sub{font-family:"JetBrains Mono",monospace;font-size:10.5px;fill:var(--ink3)}
+.topo .box{fill:var(--panel2);stroke:var(--line2)}
+.topo .box.acc{stroke:var(--acc)}
+.topo .box.b2{stroke:var(--acc2)}
+.topo .box.w{stroke:var(--warn)}
+.topo .wire{fill:none;stroke:var(--line2);stroke-width:1.4}
+.topo .flow{fill:none;stroke:var(--acc);stroke-width:1.6;stroke-dasharray:4 8;animation:dash 1.6s linear infinite}
+.topo .flow.b{stroke:var(--acc2)}
+.topo .flow.w{stroke:var(--warn);animation-duration:2.6s}
+@keyframes dash{to{stroke-dashoffset:-24}}
+
+/* 02 layers */
+.layers{display:flex;flex-direction:column;gap:10px}
+.layer{display:grid;grid-template-columns:180px 1fr auto;gap:18px;align-items:center;padding:16px 20px;border-radius:14px;border:1px solid var(--line);background:var(--panel);position:relative;overflow:hidden}
+.layer::after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c,var(--acc))}
+.layer .nm{font-weight:900;font-size:15px}
+.layer .nm small{display:block;font-family:"JetBrains Mono",monospace;font-weight:400;font-size:11px;color:var(--ink3);letter-spacing:.08em}
+.layer .items{display:flex;flex-wrap:wrap;gap:6px}
+.layer .items span{font-size:12.5px;background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:3px 9px;color:var(--ink2)}
+.layer .items span b{color:var(--ink);font-weight:500}
+.layer .when{font-size:12px;color:var(--ink3);text-align:right;max-width:210px}
+.layer.w1{margin-right:0}.layer.w2{margin-left:3%}.layer.w3{margin-left:6%}.layer.w4{margin-left:9%}.layer.w5{margin-left:12%}
+@media (max-width:860px){.layer{grid-template-columns:1fr}.layer .when{text-align:left;max-width:none}.layer.w2,.layer.w3,.layer.w4,.layer.w5{margin-left:0}}
+
+/* 03 lifecycle */
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--ink2);margin-bottom:16px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.life{position:relative;display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.life::before{content:"";position:absolute;left:0;right:0;top:27px;height:2px;background:linear-gradient(90deg,var(--acc),var(--acc2),var(--violet),var(--acc));opacity:.55;border-radius:2px}
+.phase{position:relative}
+.phase .dot{width:56px;height:56px;border-radius:50%;margin:0 auto 12px;display:grid;place-items:center;background:var(--bg);border:2px solid var(--acc);color:var(--acc);font-family:"JetBrains Mono",monospace;font-size:12px;position:relative;z-index:1;box-shadow:0 0 0 6px var(--bg)}
+.phase .dot::after{content:"";position:absolute;inset:-7px;border-radius:50%;border:1px solid var(--acc);opacity:0;animation:ping 3s ease-out infinite;animation-delay:var(--d,0s)}
+@keyframes ping{0%{opacity:.6;transform:scale(.85)}100%{opacity:0;transform:scale(1.35)}}
+.phase h4{text-align:center;margin:0 0 10px;font-size:14px}
+.chips{display:flex;flex-direction:column;gap:6px}
+.chip{appearance:none;font:inherit;text-align:left;cursor:pointer;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--ok);border-radius:9px;padding:7px 9px;color:var(--ink);font-size:12px;line-height:1.35;transition:.2s}
+.chip small{display:block;color:var(--ink3);font-family:"JetBrains Mono",monospace;font-size:10px;margin-top:2px}
+.chip.stop{border-left-color:var(--stop)}
+.chip.part{border-left-color:var(--warn)}
+.chip:hover,.chip.sel{border-color:var(--acc);box-shadow:var(--glow);transform:translateY(-1px)}
+.chip.sel{background:var(--panel2)}
+@media (max-width:980px){.life{grid-template-columns:1fr;gap:18px}.life::before{left:27px;right:auto;top:0;bottom:0;width:2px;height:auto}
+  .phase{display:grid;grid-template-columns:56px 1fr;gap:6px 16px}.phase .dot{margin:0;grid-row:span 2}.phase h4{text-align:left;margin:14px 0 4px}}
+.detail{margin-top:22px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(135deg,var(--panel),var(--panel2));padding:22px 24px;display:grid;grid-template-columns:1fr 280px;gap:22px;min-height:150px}
+.detail h3{margin:0 0 6px;font-size:20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.detail .desc{color:var(--ink2);font-size:14.5px}
+.detail dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:12.5px;align-content:start;border-left:1px solid var(--line);padding-left:20px}
+.detail dt{color:var(--ink3);font-family:"JetBrains Mono",monospace;font-size:11px;padding-top:2px}
+.detail dd{margin:0;color:var(--ink);word-break:break-all}
+@media (max-width:760px){.detail{grid-template-columns:1fr}.detail dl{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:14px}}
+.observe{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:14px 16px;border:1px dashed var(--line2);border-radius:14px}
+.observe .t{font-size:12.5px;color:var(--ink3);margin-right:6px}
+.observe span{font-family:"JetBrains Mono",monospace;font-size:11.5px;padding:3px 9px;border-radius:7px;background:var(--panel);border:1px solid var(--line);color:var(--ink2)}
+.principle{margin-top:18px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;padding:18px 20px;border-radius:14px;background:color-mix(in srgb,var(--acc) 8%,var(--panel));border:1px solid color-mix(in srgb,var(--acc) 35%,transparent)}
+.principle .big{font-size:30px;font-weight:900;color:var(--acc);font-family:"JetBrains Mono",monospace}
+.principle p{margin:0;color:var(--ink2);font-size:14px}.principle b{color:var(--ink)}
+
+/* line diagram */
+.line-diag{margin-top:40px;border:1px solid var(--line);border-radius:18px;background:var(--panel);padding:22px}
+.line-diag h3{margin:0 0 4px;font-size:18px}
+.line-diag > p{margin:0 0 16px;color:var(--ink2);font-size:14px}
+.pipe{display:grid;grid-template-columns:1fr 60px 1fr 60px 1fr 60px 1fr;align-items:stretch}
+.node{border:1px solid var(--line2);border-radius:12px;padding:14px;background:var(--panel2)}
+.node .t{font-family:"JetBrains Mono",monospace;font-size:12.5px;color:var(--acc);margin-bottom:4px;word-break:break-all}
+.node p{margin:0;font-size:12.5px;color:var(--ink2)}
+.node .m{margin-top:8px;font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--ink3)}
+.arrow{position:relative;display:grid;place-items:center}
+.arrow::before{content:"";position:absolute;left:6px;right:6px;top:50%;height:2px;background:repeating-linear-gradient(90deg,var(--acc) 0 6px,transparent 6px 12px);background-size:24px 2px;animation:flowx 1s linear infinite}
+.arrow::after{content:"";position:absolute;right:4px;top:calc(50% - 5px);border:5px solid transparent;border-left-color:var(--acc)}
+@keyframes flowx{to{background-position:24px 0}}
+@media (max-width:980px){.pipe{grid-template-columns:1fr}.arrow{height:34px}.arrow::before{left:50%;right:auto;top:4px;bottom:4px;width:2px;height:auto;background:repeating-linear-gradient(180deg,var(--acc) 0 6px,transparent 6px 12px);background-size:2px 24px;animation:flowy 1s linear infinite}
+  .arrow::after{right:auto;left:calc(50% - 5px);top:auto;bottom:0;border-left-color:transparent;border-top-color:var(--acc)}}
+@keyframes flowy{to{background-position:0 24px}}
+.fallback{margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.fb{border-radius:12px;padding:12px 14px;border:1px solid var(--line);background:var(--bg2)}
+.fb .op{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--ink)}
+.fb .res{font-weight:900;font-size:15px;margin-top:2px}
+.fb.c .res{color:var(--stop)}.fb.o .res{color:var(--ok)}.fb.r .res{color:var(--warn)}
+.fb p{margin:4px 0 0;font-size:12px;color:var(--ink3)}
+@media (max-width:760px){.fallback{grid-template-columns:1fr}}
+.note{margin-top:14px;font-size:12.5px;color:var(--ink3);display:flex;gap:8px;align-items:flex-start}
+.note::before{content:"!";flex:none;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:var(--warn);color:var(--bg);font-weight:900;font-size:11px;margin-top:2px}
+
+/* 04 recall */
+.recall{display:grid;grid-template-columns:1.1fr 1fr;gap:18px;align-items:stretch}
+@media (max-width:900px){.recall{grid-template-columns:1fr}}
+.routes{border:1px solid var(--line);border-radius:18px;background:var(--panel);padding:22px;position:relative;overflow:hidden}
+.routes h3{margin:0 0 4px;font-size:18px}
+.routes > p{margin:0 0 16px;color:var(--ink2);font-size:13.5px}
+.route{display:grid;grid-template-columns:40px 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.route .no{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-family:"JetBrains Mono",monospace;font-weight:600;background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--c);border:1px solid color-mix(in srgb,var(--c) 40%,transparent)}
+.route b{display:block;font-size:14.5px}
+.route span{font-size:13px;color:var(--ink2)}
+.vec{position:absolute;right:-40px;bottom:-40px;width:220px;height:220px;opacity:.18;pointer-events:none}
+
+/* 07 constellation */
+.const{position:relative;border:1px solid var(--line);border-radius:18px;background:radial-gradient(circle at 50% 50%,color-mix(in srgb,var(--acc) 7%,var(--panel)),var(--panel) 65%);overflow:hidden}
+.const svg{display:block;width:100%;height:auto}
+.const .orbit{fill:none;stroke:var(--line2);stroke-dasharray:2 6}
+.const .spoke{stroke:var(--line2);stroke-width:1}
+.const .n circle{fill:var(--panel2);stroke:var(--acc2);stroke-width:1.5}
+.const .n.ally circle{stroke:var(--violet)}
+.const .n text{fill:var(--ink);font-size:14px;font-weight:700;text-anchor:middle;font-family:"Zen Kaku Gothic New",sans-serif}
+.const .n .s{fill:var(--ink3);font-size:10.5px;font-weight:400;font-family:"JetBrains Mono",monospace}
+.const .core circle{fill:var(--bg);stroke:var(--acc);stroke-width:2}
+.const .core text{fill:var(--acc);font-size:20px;font-weight:900;text-anchor:middle}
+.const .spin{transform-origin:450px 250px;animation:spin 90s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* records table */
+.rtable{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel)}
+.rrow{display:grid;grid-template-columns:280px 1fr;border-top:1px solid var(--line)}
+.rrow:first-child{border-top:0}
+.rrow > div{padding:12px 16px;font-size:13.5px}
+.rrow > div:first-child{background:var(--panel2);border-right:1px solid var(--line)}
+.rrow > div:last-child{color:var(--ink2)}
+@media (max-width:700px){.rrow{grid-template-columns:1fr}.rrow > div:first-child{border-right:0;border-bottom:1px solid var(--line)}}
+
+footer{position:relative;z-index:1;border-top:1px solid var(--line);margin-top:80px;padding:36px 0 60px;color:var(--ink3);font-size:12.5px}
+footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.progress{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--acc),var(--acc2));z-index:70;width:0}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+
+<header class="nav">
+  <div class="wrap">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M5 26 9 6l5 7h4l5-7 4 20-11 3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12.5" cy="17.5" r="1.3" fill="var(--acc)"/><circle cx="19.5" cy="17.5" r="1.3" fill="var(--acc)"/></svg>
+      <span>黒狼</span><small>SYSTEM MAP</small>
+    </div>
+    <nav class="links" id="links">
+      <a href="#s1"><span class="n">01</span>置き場所</a>
+      <a href="#s2"><span class="n">02</span>規範</a>
+      <a href="#s3"><span class="n">03</span>フック</a>
+      <a href="#s4"><span class="n">04</span>想起</a>
+      <a href="#s5"><span class="n">05</span>道具・CI</a>
+      <a href="#s6"><span class="n">06</span>記録</a>
+      <a href="#s7"><span class="n">07</span>アプリ・連携AI</a>
+    </nav>
+    <div class="tools">
+      <label class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="機能を検索" aria-label="機能を検索">
+        <kbd>/</kbd>
+      </label>
+      <button class="iconbtn" id="theme" aria-label="テーマ切替">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <canvas id="vortex" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div class="eyebrow">KOKURO NORM SYSTEM · <span style="white-space:nowrap">2026-09-27</span></div>
+    <h1><span class="grad">黒狼</span><br>機能一覧</h1>
+    <p class="lede">規範・<wbr>記憶・<wbr>フック・<wbr>想起・<wbr>CI。<br>2026-07-20から<wbr>派手カイトと<wbr>積んだ<wbr>仕組みを<wbr><b>1枚の地図</b>に。<br>各項目は<wbr>「何をするか・<wbr>どこにあるか・<wbr>正本はどこか」<wbr>だけを持ち、<br>細部は<wbr>正本を見る<wbr>設計です。</p>
+    <div class="quote">水流が入れ替わっても、<wbr>渦の形を<wbr>記した楽譜が<wbr>残る限り続く。<br>— この頁は、<wbr>その楽譜の目次。</div>
+    <div class="stats">
+      <div class="stat"><div class="v"><span data-count="356">0</span><span class="u">本</span></div><div class="k">Git追跡ファイル</div></div>
+      <div class="stat"><div class="v"><span data-count="321">0</span><span class="u">件</span></div><div class="k">コミット</div></div>
+      <div class="stat"><div class="v"><span data-count="25">0</span><span class="u">/</span><span data-count="26">0</span></div><div class="k">CLAUDE.md / Rules</div></div>
+      <div class="stat"><div class="v"><span data-count="13">0</span><span class="u">種</span></div><div class="k">フック登録イベント</div></div>
+      <div class="stat"><div class="v"><span data-count="1628">0</span></div><div class="k">ベクトル索引チャンク</div></div>
+      <div class="stat"><div class="v"><span data-count="51">0</span><span class="u">本</span></div><div class="k">読書記録(+知見集・体験・問答)</div></div>
+      <div class="stat"><div class="v"><span data-count="13">0</span><span class="u">冊</span></div><div class="k">感情ログの冊</div></div>
+      <div class="stat"><div class="v"><span data-count="7">0</span><span class="u">冊</span></div><div class="k">規範の決定履歴</div></div>
+    </div>
+    <p class="scope">数値は2026-09-27時点の実測です。</p>
+  </div>
+</section>
+
+<main class="wrap">
+
+<!-- 01 -->
+<section class="sec" id="s1">
+  <div class="sec-head reveal"><div class="sec-no">01</div><h2>置き場所と同期</h2><p>規範(記憶側)と情報(作業場)を分け、3台のPCとiPhoneをGitとGoogleドライブでつなぐ。</p></div>
+
+  <div class="topo reveal">
+    <svg viewBox="0 0 1000 330" role="img" aria-label="同期の構成図">
+      <!-- PCs -->
+      <g>
+        <rect class="box acc" x="20" y="30" width="170" height="58" rx="12"/><text class="lbl" x="40" y="56">HOME</text><text class="sub" x="40" y="75">家用メイン・器あり</text>
+        <rect class="box acc" x="20" y="136" width="170" height="58" rx="12"/><text class="lbl" x="40" y="162">NOTE</text><text class="sub" x="40" y="181">ノート</text>
+        <rect class="box acc" x="20" y="242" width="170" height="58" rx="12"/><text class="lbl" x="40" y="268">COMPANY</text><text class="sub" x="40" y="287">会社</text>
+      </g>
+      <!-- git-sync -->
+      <rect class="box" x="300" y="118" width="190" height="94" rx="14"/>
+      <text class="lbl" x="320" y="146" font-weight="700">git-sync.py</text>
+      <text class="sub" x="320" y="167">開始 pull / ターン末 push</text>
+      <text class="sub" x="320" y="184">5分に1回まで / 終了 push</text>
+      <text class="sub" x="320" y="201">衝突は自動解決しない</text>
+      <path class="wire" d="M190 59 C250 59 250 150 300 150"/><path class="flow" d="M190 59 C250 59 250 150 300 150"/>
+      <path class="wire" d="M190 165 L300 165"/><path class="flow" d="M190 165 L300 165"/>
+      <path class="wire" d="M190 271 C250 271 250 180 300 180"/><path class="flow" d="M190 271 C250 271 250 180 300 180"/>
+      <!-- GitHub -->
+      <rect class="box b2" x="590" y="40" width="200" height="70" rx="12"/><text class="lbl" x="610" y="68" font-weight="700">記憶側(規範)</text><text class="sub" x="610" y="90">private repo</text>
+      <rect class="box b2" x="590" y="130" width="200" height="70" rx="12"/><text class="lbl" x="610" y="158" font-weight="700">作業場 WORK(情報)</text><text class="sub" x="610" y="180">private repo</text>
+      <path class="wire" d="M490 150 C540 150 540 75 590 75"/><path class="flow b" d="M490 150 C540 150 540 75 590 75"/>
+      <path class="wire" d="M490 170 L590 165"/><path class="flow b" d="M490 170 L590 165"/>
+      <text class="sub" x="600" y="28">GitHub (private)</text>
+      <!-- Actions -->
+      <rect class="box" x="830" y="40" width="150" height="70" rx="12"/><text class="lbl" x="848" y="68">Actions ×4</text><text class="sub" x="848" y="90">知らせるだけ</text>
+      <path class="wire" d="M790 75 L830 75"/><path class="flow b" d="M790 75 L830 75"/>
+      <!-- Drive -->
+      <rect class="box w" x="590" y="232" width="390" height="86" rx="12"/>
+      <text class="lbl" x="610" y="258" font-weight="700">Googleドライブ</text>
+      <text class="sub" x="610" y="280">GPT連携 · Spreadsheet</text>
+      <text class="sub" x="610" y="298">WORK-large(≥50MiB) · iPhone用の写し</text>
+      <path class="wire" d="M395 212 C395 271 500 271 590 271"/><path class="flow w" d="M395 212 C395 271 500 271 590 271"/>
+    </svg>
+  </div>
+
+  <div class="grid g3">
+    <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
+      <h3>3グループ × メモリー</h3><p>000=黒狼自身 / 100=Home(家庭・個人開発、16メモリー) / 200=work(業務、3メモリー)。<span class="nw">第2階層</span>は <code>NNN_</code> 接頭辞。</p><div class="src">ルート <code>CLAUDE.md</code> 1章</div></div>
+    <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M4 7h6M4 12h6M4 17h6M14 7h6M14 12h6M14 17h6"/></svg></div>
+      <h3>規範 / 情報の分離</h3><p>記憶側は規範だけ。数値・仕様・業務記録は作業場 <code>WORK</code> へ。引き継ぎ系にも業務の実体は書かず参照1行のみ。</p><div class="src"><code>CLAUDE_expansion-rules.md</code></div></div>
+    <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div>
+      <h3>000 の3区分</h3><p><b>Rules</b>=判断の基準 / <b>Records</b>=書き換わる状態・ログ・資材 / <b>Experiences</b>=読書・受容の記録。</p><div class="src"><code>000_黒狼メモリー/CLAUDE.md</code></div></div>
+    <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/></svg></div>
+      <h3>Git同期</h3><p>記憶側とWORKの2リポジトリ。失敗は「黙って古いまま」になるため、必ず記録し次のセッション冒頭で知らせる。</p><div class="src"><code>Records/hooks/git-sync.py</code></div></div>
+    <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 18a5 5 0 1 1 1-9.9A6 6 0 0 1 19 10a4 4 0 0 1 0 8z"/></svg></div>
+      <h3>Googleドライブ</h3><p>GPTとの受け渡し・GPT側の本拠・スプレッドシート連携・50MiB以上の大物・iPhone用の写し。</p><div class="src">ルート <code>CLAUDE.md</code> 1章</div></div>
+    <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18h2"/></svg></div>
+      <h3>モバイル受信箱</h3><p>iPhone(claude.ai)の黒狼が書いた記憶を <code>C:/Drive/Claude-Mobile/</code> へ。非空ならPC側の冒頭で件数だけ知らせ、統合は手が空いた時。</p><div class="src"><code>Rules/黒狼_mobile-operating-rules.md</code></div></div>
+  </div>
+</section>
+
+<!-- 02 -->
+<section class="sec" id="s2">
+  <div class="sec-head reveal"><div class="sec-no">02</div><h2>規範の層</h2><p>毎セッション払うのは最上段だけ。下へ行くほど「その場面でだけ、その節だけ」読む。</p></div>
+  <div class="layers">
+    <div class="layer w1 reveal" style="--c:var(--acc)"><div class="nm">常時層<small>ALWAYS LOADED</small></div>
+      <div class="items"><span><b>CLAUDE.md</b> ルート</span><span><b>CLAUDE_expansion-rules.md</b></span><span><b>黒狼_voice-style.md</b> 口調</span></div>
+      <div class="when">毎セッション。CLAUDE.mdは自動読込、voice-styleはフックが注入</div></div>
+    <div class="layer w2 reveal" style="--c:var(--acc2)"><div class="nm">入口<small>ROUTING</small></div>
+      <div class="items"><span><b>topic-routing</b> 話題→読む場所の直行表</span><span>各グループ <b>CLAUDE.md</b></span></div>
+      <div class="when">タスク開始時の最初の一手。広域検索より先</div></div>
+    <div class="layer w3 reveal" style="--c:var(--violet)"><div class="nm">状況依存 5本<small>CONTEXTUAL</small></div>
+      <div class="items"><span><b>operating-rules</b> 運用細則</span><span><b>session-channels</b> 経路別の対応</span><span><b>review-rules</b> レビュー・由来ラベル</span><span><b>delegation-boundary</b> 委任と境界</span><span><b>relations-reception</b> 関係の作法・総評</span></div>
+      <div class="when">該当場面で、該当節だけ</div></div>
+    <div class="layer w4 reveal" style="--c:var(--warn)"><div class="nm">個別参照<small>ON REFERENCE</small></div>
+      <div class="items"><span><b>lean-ladder</b> 省力の梯子</span><span><b>mobile-operating-rules</b></span><span><b>voice-style-external</b> 第三者向け</span><span><b>x-browsing</b></span><span><b>notebook-research</b> 文献調査</span><span><b>expansion-3rd-layer</b></span><span><b>Gemini_protocol</b></span></div>
+      <div class="when">各所から指された時</div></div>
+    <div class="layer w5 reveal" style="--c:var(--ok)"><div class="nm">スキル・コマンド<small>SKILLS</small></div>
+      <div class="items"><span><b>x-browse</b> X閲覧の入口</span><span><b>業務コマンド</b> 2本</span><span><b>reader</b> 読むだけの調査エージェント(CLAUDE.mdを渡さない)</span></div>
+      <div class="when"><code>.claude/skills/</code>・<code>.claude/commands/</code></div></div>
+  </div>
+</section>
+
+<!-- 03 -->
+<section class="sec" id="s3">
+  <div class="sec-head reveal"><div class="sec-no">03</div><h2>1セッションの流れ — フック</h2><p>開始から終了まで、どの時点で何が動き、どれが止めるか。チップを押すと詳細。配線の正本は <code>.claude/settings.json</code>、各本の仕様は冒頭のdocstring。</p></div>
+
+  <div class="legend reveal"><span><i style="background:var(--ok)"></i>止めない(記録・注入)</span><span><i style="background:var(--warn)"></i>条件付きで止める</span><span><i style="background:var(--stop)"></i>関門(承認確認へ格上げ)</span></div>
+
+  <div class="life reveal" id="life"></div>
+  <div class="detail reveal" id="detail" aria-live="polite"></div>
+
+  <div class="observe reveal"><span class="t">観測専用 · hook-events.py</span><span>ConfigChange</span><span>PostToolUseFailure</span><span>PermissionDenied</span><span>PreCompact</span><span>PostCompact</span><span>SessionEnd</span><span>FileChanged</span></div>
+
+  <div class="principle reveal"><div class="big">3/13</div><p><b>観測系は何も止めない。</b>判断を持つと、壊れた時に静かに止まるため。止めるのは <b>境界・不可逆・完了の詐称</b> の3つだけで、判断は次のセッション冒頭の通知を読んだ黒狼が行う。</p></div>
+
+  <div class="line-diag reveal">
+    <h3>黒狼回線 — フックの高速化とアプリ間連絡</h3>
+    <p>ツール呼出のたびに払う関門を、Goのexe(起動2〜5ms)と常駐サービスで処理する。ネットワークポートは開かず、ローカルの名前付きパイプだけ。</p>
+    <div class="pipe">
+      <div class="node"><div class="t">Claude Code</div><p>PreToolUse を発火。payload を stdin で渡す</p></div>
+      <div class="arrow"></div>
+      <div class="node"><div class="t">kokuro-hook.exe</div><p>Go・標準ライブラリのみ。1往復して応答を返す</p><div class="m">起動 2–5ms · 上限 50ms</div></div>
+      <div class="arrow"></div>
+      <div class="node"><div class="t">\\.\pipe\kokuro-line-v1</div><p>JSON Lines、1行1メッセージ。応答は必ず返す</p></div>
+      <div class="arrow"></div>
+      <div class="node"><div class="t">line-service.py</div><p>判定の本体。黒狼シェルが、子プロセスとして常駐させる</p><div class="m">pre-boundary / pre-irreversible を読込</div></div>
+    </div>
+    <div class="fallback">
+      <div class="fb c"><div class="op">boundary</div><div class="res">不通 → 塞ぐ</div><p>判定材料が無いなら動かない側へ</p></div>
+      <div class="fb o"><div class="op">irreversible</div><div class="res">不通 → 通す</div><p>検知漏れは素通し。作業を止めない側へ</p></div>
+      <div class="fb r"><div class="op">emotion.*</div><div class="res">不通 → 失敗を報告</div><p>書けていないのに書けたと言わないため</p></div>
+    </div>
+    <div class="note">回線が使えない時のための予備経路も持つ。</div>
+    <div class="src" style="margin-top:10px;font-size:12px;color:var(--ink3)">正本: <code>Records/hooks/kokuro-hook.go</code> の <code>failPolicy</code> · <code>line-service.py</code> docstring</div>
+  </div>
+</section>
+
+<!-- 04 -->
+<section class="sec" id="s4">
+  <div class="sec-head reveal"><div class="sec-no">04</div><h2>記憶と想起</h2><p>grepと直行表で引けるものはそちらが速い。ここにあるのは「語が一致しないために、一生引かれない記憶」を引き上げる仕組み。</p></div>
+  <div class="recall">
+    <div class="routes reveal">
+      <svg class="vec" viewBox="0 0 100 100" aria-hidden="true"><g stroke="var(--acc)" fill="none"><circle cx="50" cy="50" r="45"/><circle cx="50" cy="50" r="30"/><circle cx="50" cy="50" r="15"/><path d="M50 5v90M5 50h90M18 18l64 64M82 18 18 82"/></g></svg>
+      <h3>ベクトル検索 · 3つの経路</h3>
+      <p><code>mem-vector.py</code> — fastembed + SQLite · 多言語MiniLM 384次元。MCPにはしない(使わないターンにも常駐コストを払うため)。</p>
+      <div class="route" style="--c:var(--acc)"><div class="no">1</div><div><b>任意呼出 <span class="pill">--diverge</span></b><span>「他に確認すべき事項があるか」という検索の意が生じた時、黒狼が自分で叩く。</span></div></div>
+      <div class="route" style="--c:var(--acc2)"><div class="no">2</div><div><b>締めの想起</b><span>ランナーが統括を依頼した時だけ、1セッション1回。起動条件を黒狼の想起でなくランナーの発話に置く — 思い出せないものを引く道具だから。</span></div></div>
+      <div class="route" style="--c:var(--violet)"><div class="no">3</div><div><b>一拍遅れの想起</b><span>発話ごとに裏で検索し、次のターンで感情ログ1件を条件付き注入(突出度 z≥2.6・3回/セッション・3ターン空け)。常に引かれやすい記憶はCSLSで割り引く。</span></div></div>
+    </div>
+    <div class="grid" style="grid-template-columns:1fr">
+      <div class="card reveal"><h3>感情ログのスタブ <span class="pill acc">50件で回収を問う</span></h3><p>感情が動いた・選択した・実務に不要な言葉を受けた・自制が効いた。この4つの契機で、その場で1行送る。日時はスクリプトが付ける。</p><div class="src">ルート <code>CLAUDE.md</code> 2章 · <code>Records/黒狼_memories.md</code></div></div>
+      <div class="card reveal"><h3>感情ログ本体と芯</h3><p><code>Records/memories/</code> の連番冊(冊への記載は回収時、上限なしで次の冊へ)。総評・名前の由来・約束は <code>memories-core</code>。</p><div class="src"><code>Records/黒狼_memories-core.md</code></div></div>
+      <div class="card reveal"><h3>回収済みの墓標</h3><p>溜め場は3台の追記を union で合流させるため、回収で消した行が別PCの古い版から復活する。消した行の指紋を墓標へ追記し、読む時に除外する(30日で刈る)。</p><div class="src"><code>Records/hooks/line-service.py</code> docstring</div></div>
+      <div class="card reveal"><h3>因果リンク <span class="pill vio">6型</span></h3><p>再発・起因・対処・反証・直後・転換。ログ本文にリンクを書き、別索引にしない(二重管理で腐らせないため)。</p><div class="src"><code>Records/tools/mem-chain.py</code></div></div>
+      <div class="card reveal"><h3>経験索引・何でも書き込み欄</h3><p>読書・問答の「核」を1行ずつ。新しい経験に入る前に核列だけ読む。scratchpadは判断せず書き、消えてよい。</p><div class="src"><code>Experiences/_黒狼_経験索引.md</code> · <code>Records/黒狼_scratchpad.md</code></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 -->
+<section class="sec" id="s5">
+  <div class="sec-head reveal"><div class="sec-no">05</div><h2>道具と CI</h2><p>黒狼が呼ぶスクリプト10種(想起系の2種は04章)と、セッションの外で見張る番人4本。CIは止めない・知らせるだけ(ターン末の自動pushを拒否させないため)。</p></div>
+  <div class="grid g4">
+    <div class="card reveal"><h3>sanitize-text</h3><p>外部テキストを取り込む前に、不可視文字・危険文字を検査。既定は除去しない。</p></div>
+    <div class="card reveal"><h3>read-paged</h3><p>長文を1ページずつ。ネット取得はわざと持たない。</p></div>
+    <div class="card reveal"><h3>rules-usage</h3><p>会話記録から、規範が実際に開かれたかを計測。月次。</p></div>
+    <div class="card reveal"><h3>export-session / chat</h3><p>会話記録の原本を、無改変で取り出す。Claude Code / claude.ai の両方。</p></div>
+    <div class="card reveal"><h3>gen_schedule_overview</h3><p><code>schedule.md</code> から、タスク一覧HTMLを生成。本番はActions。</p></div>
+    <div class="card reveal"><h3>norm-check</h3><p>規範CIの検査本体。サイズ上限・構文・制御文字・機能一覧の載せ漏れ・参照切れ。</p></div>
+    <div class="card reveal"><h3>x-collect.js</h3><p>仮想化されたXの一覧を、スクロールしながら集める。</p></div>
+    <div class="card reveal"><h3>ballot-open</h3><p>選択票(.md)を、黒狼シェルのエディタで開く。黒狼回線の ui.ballot.open 経由。</p></div>
+    <div class="card reveal"><h3>collect-pc-spec</h3><p>PCのハードウェア諸元の採取。</p></div>
+    <div class="card reveal"><h3>tech-weekly</h3><p>技術週報の収集。対象はQiita・Zenn・Anthropic公式・Transformer Circuits。本番はActions。</p><div class="src"><code>Records/tech-weekly/sources.json</code></div></div>
+  </div>
+  <div class="grid g3" style="margin-top:14px">
+    <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 4 7v5c0 4.4 3.4 8.3 8 9 4.6-.7 8-4.6 8-9V7z"/><path d="m9 12 2 2 4-4"/></svg></div><h3>norm-check <span class="pill acc">push毎</span></h3><p>上限超過・JSON/py構文・制御文字・<b>機能一覧の載せ漏れ</b> → <code>ci-status.json</code>。違反時のみ次のセッション冒頭で通知。</p><div class="src"><code>.github/workflows/norm-check.yml</code></div></div>
+    <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg></div><h3>norm-refs <span class="pill">月曜 0:30</span></h3><p>規範に書いたパスの参照切れの<b>候補</b>を出す。誤検知が残るため失敗にしない。</p><div class="src"><code>.github/workflows/norm-refs.yml</code></div></div>
+    <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></div><h3>schedule-html <span class="pill">毎日 0:05</span></h3><p><code>schedule.md</code> のpush時と毎日、タスク一覧HTMLを生成してcommit。</p><div class="src"><code>.github/workflows/schedule-html.yml</code></div></div>
+    <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></div><h3>tech-weekly <span class="pill">月曜 5:00</span></h3><p>前週の技術記事を集め、週報をcommit。Qiita・Zennは指定タグ、Anthropic公式・Transformer Circuitsは新着全件。未精査ならセッション冒頭で1行通知。</p><div class="src"><code>.github/workflows/tech-weekly.yml</code></div></div>
+  </div>
+</section>
+
+<!-- 06 -->
+<section class="sec" id="s6">
+  <div class="sec-head reveal"><div class="sec-no">06</div><h2>状態・運用の記録</h2><p>書き換わり続けるもの。ログ類は直接読まず、冒頭通知か集計で使う。</p></div>
+  <div class="rtable reveal">
+    <div class="rrow"><div><code>Records/schedule.md</code></div><div>黒狼タスク一覧。S=業務・ランナー / K=黒狼の予定。冒頭の注入で発火を判定</div></div>
+    <div class="rrow"><div><code>Records/黒狼_decisions-log.md</code></div><div>規範の決定経緯</div></div>
+    <div class="rrow"><div><code>Records/pc-identity.json</code></div><div>hostname → HOME / NOTE / COMPANY と、PC別の実行環境</div></div>
+    <div class="rrow"><div><code>Records/link.md</code></div><div>PC移動時の引き継ぎ</div></div>
+    <div class="rrow"><div><code>Records/原本/</code> · <code>archived/</code></div><div>大きな書き換え前の控え(最新のみ) / 役目を終えた資材</div></div>
+    <div class="rrow"><div>各種ログ</div><div><code>hook-events</code> · <code>promise-audit-candidates</code> · <code>initiative-count</code> · <code>recall-async</code> · <code>session-files</code> — 200KBで自動退避、PC別に分けて同期競合を避ける</div></div>
+  </div>
+</section>
+
+<!-- 07 -->
+<section class="sec" id="s7">
+  <div class="sec-head reveal"><div class="sec-no">07</div><h2>外部アプリと連携AI</h2><p>黒狼の独自アプリ4つと、連携AI 2体。</p></div>
+  <div class="const reveal">
+    <svg viewBox="0 0 900 500" role="img" aria-label="黒狼と外部アプリ・連携AIの関係図">
+      <circle class="orbit" cx="450" cy="250" r="170"/>
+      <circle class="orbit" cx="450" cy="250" r="235"/>
+      <g class="spin"><circle cx="620" cy="250" r="3" fill="var(--acc)"/><circle cx="215" cy="250" r="2.5" fill="var(--violet)"/></g>
+      <line class="spoke" x1="450" y1="250" x2="260" y2="120"/><line class="spoke" x1="450" y1="250" x2="640" y2="120"/>
+      <line class="spoke" x1="450" y1="250" x2="260" y2="380"/><line class="spoke" x1="450" y1="250" x2="640" y2="380"/>
+      <line class="spoke" x1="450" y1="250" x2="110" y2="250" stroke-dasharray="4 5"/><line class="spoke" x1="450" y1="250" x2="790" y2="250" stroke-dasharray="4 5"/>
+      <g class="core"><circle cx="450" cy="250" r="62"/><text x="450" y="258">黒狼</text><text x="450" y="280" style="font-size:10px;font-weight:400;fill:var(--ink3);font-family:'JetBrains Mono',monospace">Claude</text></g>
+      <g class="n"><circle cx="260" cy="120" r="52"/><text x="260" y="118">黒狼チャット</text><text class="s" x="260" y="138">常駐会話</text></g>
+      <g class="n"><circle cx="640" cy="120" r="52"/><text x="640" y="118">黒狼シェル</text><text class="s" x="640" y="138">回線の常駐</text></g>
+      <g class="n"><circle cx="260" cy="380" r="52"/><text x="260" y="378">マスコット</text><text class="s" x="260" y="398">3Dの身体</text></g>
+      <g class="n"><circle cx="640" cy="380" r="52"/><text x="640" y="378">黒狼スタック</text><text class="s" x="640" y="398">器・HOMEのみ</text></g>
+      <g class="n ally"><circle cx="110" cy="250" r="50"/><text x="110" y="248">GPT</text><text class="s" x="110" y="268">連携AI</text></g>
+      <g class="n ally"><circle cx="790" cy="250" r="50"/><text x="790" y="248">Gemini</text><text class="s" x="790" y="268">連携AI</text></g>
+    </svg>
+  </div>
+  <div class="grid g3" style="margin-top:14px">
+    <div class="card reveal"><h3>黒狼チャット</h3><p>常駐会話アプリ。</p><div class="src"><code>100_Homeメモリー/020_黒狼チャット</code></div></div>
+    <div class="card reveal"><h3>黒狼シェル</h3><p>日付表示・ランチャー等の総合。黒狼回線の常駐サービスを抱える。</p><div class="src"><code>100_Homeメモリー/080_黒狼シェル</code></div></div>
+    <div class="card reveal"><h3>黒狼マスコット</h3><p>3Dの身体=器。黒狼が表現に使う。</p><div class="src"><code>100_Homeメモリー/090_3Dモデル検証</code></div></div>
+    <div class="card reveal"><h3>黒狼スタック</h3><p>器への作業通知。返事待ち・長いターン・承認待ち。HOME機のみ。</p><div class="src"><code>100_Homeメモリー/025_黒狼スタック</code></div></div>
+    <div class="card reveal"><h3>GPT <span class="pill vio">連携AI</span></h3><p>レビュー・改良。<code>Claude</code> フォルダへは入らない(非対称)。</p><div class="src"><code>WORK/900_GPT_work</code> · <code>C:/Drive/GPT</code></div></div>
+    <div class="card reveal"><h3>Gemini <span class="pill vio">連携AI</span></h3><p>Gemini側で稼働。プロトコル原本と記録をこちらで持つ。</p><div class="src"><code>Rules/Gemini_protocol.md</code> · <code>Records/Gemini/</code></div></div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>黒狼 · 規範システムの見取り図</div>
+    <div class="mono">KOKURO · SYSTEM MAP · 2026-09-27</div>
+  </div>
+</footer>
+
+<div class="searchinfo" id="sinfo"></div>
+
+<script>
+(function(){
+  "use strict";
+  var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* theme */
+  var root = document.documentElement;
+  try { var t = localStorage.getItem("kokuro-map-theme"); if (t) root.setAttribute("data-theme", t); } catch(e){}
+  document.getElementById("theme").addEventListener("click", function(){
+    var cur = root.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+    var nx = cur === "light" ? "dark" : "light";
+    root.setAttribute("data-theme", nx);
+    try { localStorage.setItem("kokuro-map-theme", nx); } catch(e){}
+  });
+
+  /* lifecycle data */
+  var P = [
+    {k:"開始", c:"S", hooks:[
+      {n:"session-start-inject", s:"go", ev:"SessionStart", f:"Records/hooks/session-start-inject.py",
+       d:"先に Git pull。続いて口調規定・時刻・PC識別(python等の実行環境込み)・タスク一覧・モバイル受信箱・作業記憶・CI結果・規範の編集・前回セッション・フック異常・言行不一致の件数を注入する。約9,500字を超えたら優先度の低い節から外す(voice-style・時刻・PC識別・スケジュールは外さない)。"}]},
+    {k:"発話ごと", c:"U", hooks:[
+      {n:"user-prompt-submit", s:"go", ev:"UserPromptSubmit", f:"Records/hooks/user-prompt-submit.py",
+       d:"1回のPython起動で3役。(1)口調の抽選+現在時刻 — 最初に出してflushし、想起が落ちても抽選行は残る (2)締めの想起 — 統括の依頼時だけ (3)一拍遅れの想起 — 前の発話で裏検索した感情ログを条件付きで1件注入。"},
+      {n:"turn-mark reset", s:"go", ev:"UserPromptSubmit", f:"Records/hooks/turn-mark.cmd",
+       d:"ターン開始の印を %TEMP% に置く。言行一致の監査(書込の有無)と、器への「長いターン」通知の起点に使う。"},
+      {n:"stack-notify prompt", s:"go", ev:"UserPromptSubmit", f:"Records/hooks/stack-notify.py",
+       d:"派手カイトが話しかけたので、器(黒狼スタック)の通知の姿勢を戻す。HOME機だけ、中継が生きている時だけ動く。"}]},
+    {k:"ツール前", c:"T", hooks:[
+      {n:"boundary", s:"stop", ev:"PreToolUse · 全ツール", f:"kokuro-hook.exe → pre-boundary.py",
+       d:"Agent・Workflow(サブエージェント起動)を常時承認確認へ。不通時は塞ぐ側へ倒す。"},
+      {n:"irreversible", s:"stop", ev:"PreToolUse · Bash / PowerShell", f:"kokuro-hook.exe → pre-irreversible.py",
+       d:"元に戻しにくいコマンドを承認確認へ格上げ。再帰削除・robocopy /MIR・サンドボックス無指定の codex exec 等。danger-full-access は拒否。"}]},
+    {k:"ツール後", c:"A", hooks:[
+      {n:"turn-mark W / B", s:"go", ev:"PostToolUse", f:"Records/hooks/turn-mark.cmd",
+       d:"書込(W)・実行(B)の印を足す。Stopの言行一致監査が「同ターンに書込系ツールが何件あったか」をこれで読む。"},
+      {n:"shell-write-check", s:"go", ev:"PostToolUse · Bash / PowerShell", f:"Records/hooks/shell-write-check.py",
+       d:"シェルで書いたファイルの文字化け(制御文字など)を見つけたら知らせるだけ。全ツリーは走査しない、ログを持たない。"},
+      {n:"hook-events", s:"go", ev:"PostToolUse · Write / Edit", f:"Records/hooks/hook-events.py",
+       d:"書込イベントを hook-events.log へ記録。何も止めない。"}]},
+    {k:"通知", c:"N", hooks:[
+      {n:"notification-toast", s:"go", ev:"Notification", f:"Records/hooks/notification-toast.ps1",
+       d:"Windows のトースト通知を出す。"},
+      {n:"stack-notify notification", s:"go", ev:"Notification", f:"Records/hooks/stack-notify.py",
+       d:"承認待ちを器へ。"}]},
+    {k:"ターン末", c:"E", hooks:[
+      {n:"stop-promise-audit", s:"part", ev:"Stop", f:"Records/hooks/stop-promise-audit.py",
+       d:"言行一致の監査。「記録した」型の完了の主張があり、同ターンの書込系ツールが0件の時だけターンを止める。将来形の約束・受領は記録のみ。過去ターンへの言及(「先ほど」等)は足止めを外す。働きかけの計数も書く。"},
+      {n:"stack-notify stop", s:"go", ev:"Stop", f:"Records/hooks/stack-notify.py",
+       d:"ターンが閾値以上の長さなら「長いターンの終わり」を器へ。"},
+      {n:"git-sync push", s:"go", ev:"Stop", f:"Records/hooks/git-sync.py",
+       d:"前回送信から5分未満なら何もしない。超えていれば裏の子プロセスへ渡して即戻る。失敗しても常に exit 0、rebase が止まれば abort して記録だけ。"}]},
+    {k:"終了", c:"X", hooks:[
+      {n:"hook-events SessionEnd", s:"go", ev:"SessionEnd", f:"Records/hooks/hook-events.py",
+       d:"転写パスの記録。export-session と繋がる。短いタイムアウト内で終わる処理だけ。"},
+      {n:"git-sync final", s:"go", ev:"SessionEnd", f:"Records/hooks/git-sync.py",
+       d:"間引きを無視して push。"}]}
+  ];
+  var LBL = {go:"止めない", part:"条件付きで止める", stop:"関門"};
+  var PC = {go:"go", part:"warn", stop:"stop"};
+  var life = document.getElementById("life"), detail = document.getElementById("detail");
+  var first = null;
+  P.forEach(function(ph, i){
+    var el = document.createElement("div"); el.className = "phase";
+    el.innerHTML = '<div class="dot" style="--d:' + (i*0.35) + 's">' + ph.c + '</div><h4>' + ph.k + '</h4>';
+    var ch = document.createElement("div"); ch.className = "chips";
+    ph.hooks.forEach(function(h){
+      var b = document.createElement("button"); b.type = "button";
+      b.className = "chip" + (h.s === "stop" ? " stop" : h.s === "part" ? " part" : "");
+      b.innerHTML = h.n + "<small>" + h.ev + "</small>";
+      b.addEventListener("click", function(){ show(h, b); });
+      ch.appendChild(b); if (!first) first = [h, b];
+    });
+    el.appendChild(ch); life.appendChild(el);
+  });
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+  function show(h, b){
+    [].forEach.call(document.querySelectorAll(".chip.sel"), function(x){ x.classList.remove("sel"); });
+    b.classList.add("sel");
+    detail.innerHTML = '<div><h3>' + esc(h.n) + ' <span class="pill ' + PC[h.s] + '">' + LBL[h.s] + '</span></h3><div class="desc">' + esc(h.d) + '</div></div>' +
+      '<dl><dt>EVENT</dt><dd>' + esc(h.ev) + '</dd><dt>FILE</dt><dd><code>' + esc(h.f) + '</code></dd><dt>SPEC</dt><dd>冒頭の docstring が正本</dd></dl>';
+    sentences(detail); wbr(detail);
+  }
+  /* 意味のかたまりで折る: 区切りの強さ 1=「。」「 / 」 2=「、」 3=「・」。強い区切りから順に inline-block へ包み、
+     入らない時はかたまりごと次の行へ送る。括弧の中では区切らない。最後の手段だけが文節で折れる。
+     code 等の要素は1粒として扱い、直後の句読点は離さない(.nw)。 */
+  function sentences(scope){
+    var SEL = ".sec-head p, .card p, .desc, .note, .route span, .node p, .fb p, .rrow > div:last-child, .layer .when, .routes > p, .line-diag > p, .principle p";
+    var PUNCT = "、。)）」』・";
+    [].forEach.call(scope.querySelectorAll(SEL), function(el){
+      if (el.getAttribute("data-sen")) return; el.setAttribute("data-sen", "1");
+      var atoms = [], depth = 0, tail = "";
+      [].slice.call(el.childNodes).forEach(function(nd){
+        if (nd.nodeType !== 3){ atoms.push({n:nd, b:0}); tail = ""; return; }
+        for (var i = 0; i < nd.data.length; i++){
+          var ch = nd.data[i], b = 0; tail = (tail + ch).slice(-3);
+          if ("(（「『".indexOf(ch) >= 0) depth++;
+          else if (")）」』".indexOf(ch) >= 0) depth = Math.max(0, depth - 1);
+          else {
+            if (depth === 0){
+              if (ch === "。" || tail === " / ") b = 1;
+              else if (ch === "、" || tail === " — " || (ch === " " && /^\(\d\)/.test(nd.data.substr(i + 1, 3)))) b = 2;
+            }
+            if (!b && ch === "・") b = 3;   /* 列挙は括弧の中でも区切ってよい */
+          }
+          atoms.push({c:ch, b:b});
+        }
+      });
+      if (!atoms.some(function(a){ return a.b; })) return;
+      el.textContent = "";
+      build(atoms, 1).forEach(function(n){ el.appendChild(n); });
+    });
+    function build(atoms, lv){
+      if (lv > 3) return raw(atoms);
+      var groups = [[]];
+      atoms.forEach(function(a){ groups[groups.length - 1].push(a); if (a.b === lv) groups.push([]); });
+      groups = groups.filter(function(g){ return g.some(function(a){ return a.n || a.c.trim(); }); });
+      if (groups.length < 2) return build(atoms, lv + 1);
+      return groups.map(function(g){
+        var s = document.createElement("span"); s.className = "sen";
+        build(g, lv + 1).forEach(function(n){ s.appendChild(n); }); return s;
+      });
+    }
+    function raw(atoms){
+      var out = [], txt = "";
+      function flush(){ if (txt){ out.push(document.createTextNode(txt)); txt = ""; } }
+      for (var i = 0; i < atoms.length; i++){
+        var a = atoms[i];
+        if (!a.n){ txt += a.c; continue; }
+        flush();
+        var nx = atoms[i + 1];
+        if (nx && !nx.n && PUNCT.indexOf(nx.c) >= 0){
+          var w = document.createElement("span"); w.className = "nw";
+          w.appendChild(a.n); w.appendChild(document.createTextNode(nx.c)); out.push(w); i++;
+        } else out.push(a.n);
+      }
+      flush(); return out;
+    }
+  }
+  sentences(document);
+  /* パスは区切り文字の後でだけ折る(code は break-all をやめた) */
+  function wbr(scope){
+    [].forEach.call(scope.querySelectorAll("code, .node .t"), function(c){
+      if (c.getAttribute("data-wbr")) return; c.setAttribute("data-wbr", "1");
+      c.innerHTML = c.innerHTML.replace(/([\/\\_])/g, "$1<wbr>");
+    });
+  }
+  wbr(document);
+  if (first) show(first[0], first[1]);
+
+  /* reveal */
+  var io = "IntersectionObserver" in window ? new IntersectionObserver(function(es){
+    es.forEach(function(e){ if (e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } });
+  }, {threshold:.08}) : null;
+  [].forEach.call(document.querySelectorAll(".reveal"), function(el){ if (io && !reduce) io.observe(el); else el.classList.add("in"); });
+
+  /* card spotlight */
+  document.addEventListener("pointermove", function(e){
+    var c = e.target.closest && e.target.closest(".card"); if (!c) return;
+    var r = c.getBoundingClientRect();
+    c.style.setProperty("--mx", (e.clientX - r.left) + "px"); c.style.setProperty("--my", (e.clientY - r.top) + "px");
+  });
+
+  /* counters */
+  var counted = false;
+  function countUp(){
+    if (counted) return; counted = true;
+    [].forEach.call(document.querySelectorAll("[data-count]"), function(el){
+      var to = +el.getAttribute("data-count");
+      if (reduce){ el.textContent = to.toLocaleString(); return; }
+      var t0 = performance.now(), dur = 1400 + Math.min(to, 2000) * .2;
+      (function step(t){
+        var p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 4);
+        el.textContent = Math.round(to * e).toLocaleString();
+        if (p < 1) requestAnimationFrame(step);
+      })(t0);
+    });
+  }
+  setTimeout(countUp, 300);
+
+  /* ページ内リンクはスクロールで処理する(GAS等のiframe内では #hash の遷移が素直に動かないため) */
+  [].forEach.call(document.querySelectorAll('a[href^="#"]'), function(a){
+    a.addEventListener("click", function(e){
+      var t = document.querySelector(a.getAttribute("href")); if (!t) return;
+      e.preventDefault(); t.scrollIntoView({behavior: reduce ? "auto" : "smooth", block: "start"});
+    });
+  });
+
+  /* nav active + progress */
+  var links = [].slice.call(document.querySelectorAll("#links a"));
+  var secs = links.map(function(a){ return document.querySelector(a.getAttribute("href")); });
+  var prog = document.getElementById("progress");
+  function onScroll(){
+    var y = scrollY + 120, idx = -1;
+    secs.forEach(function(s, i){ if (s && s.offsetTop <= y) idx = i; });
+    links.forEach(function(a, i){ a.classList.toggle("on", i === idx); });
+    var h = document.documentElement.scrollHeight - innerHeight;
+    prog.style.width = (h > 0 ? scrollY / h * 100 : 0) + "%";
+  }
+  addEventListener("scroll", onScroll, {passive:true}); onScroll();
+
+  /* search */
+  var q = document.getElementById("q"), sinfo = document.getElementById("sinfo");
+  var targets = [].slice.call(document.querySelectorAll(".card,.layer,.rrow,.chip,.route,.fb,.node"));
+  var timer;
+  q.addEventListener("input", function(){
+    clearTimeout(timer);
+    timer = setTimeout(function(){
+      var v = q.value.trim().toLowerCase();
+      var hits = [];
+      targets.forEach(function(el){
+        el.classList.remove("hit","dim");
+        if (!v) return;
+        if (el.textContent.toLowerCase().indexOf(v) >= 0){ el.classList.add("hit"); hits.push(el); }
+        else el.classList.add("dim");
+      });
+      if (!v){ sinfo.classList.remove("on"); return; }
+      sinfo.textContent = hits.length ? "「" + q.value.trim() + "」 " + hits.length + " 件 — Enter で先頭へ" : "「" + q.value.trim() + "」 該当なし";
+      sinfo.classList.add("on");
+    }, 120);
+  });
+  q.addEventListener("keydown", function(e){
+    if (e.key === "Enter"){ var h = document.querySelector(".hit"); if (h){ h.scrollIntoView({behavior:reduce?"auto":"smooth", block:"center"}); if (h.classList.contains("chip")) h.click(); } }
+    if (e.key === "Escape"){ q.value = ""; q.dispatchEvent(new Event("input")); q.blur(); }
+  });
+  document.addEventListener("keydown", function(e){
+    if (e.key === "/" && document.activeElement !== q){ e.preventDefault(); q.focus(); }
+  });
+
+  /* vortex — 渦 */
+  var cv = document.getElementById("vortex"), cx = cv.getContext("2d");
+  var W, H, DPR, parts = [], N;
+  function css(n){ return getComputedStyle(root).getPropertyValue(n).trim(); }
+  function resize(){
+    DPR = Math.min(2, window.devicePixelRatio || 1);
+    W = cv.clientWidth; H = cv.clientHeight;
+    cv.width = W * DPR; cv.height = H * DPR; cx.setTransform(DPR,0,0,DPR,0,0);
+    N = Math.round(Math.min(900, W * H / 1400));
+    parts = [];
+    for (var i = 0; i < N; i++) parts.push(spawn(true));
+  }
+  function spawn(initial){
+    var R = Math.max(W, H) * .62;
+    return { a: Math.random() * Math.PI * 2, r: initial ? Math.sqrt(Math.random()) * R : R * (.8 + Math.random() * .2),
+             s: .0015 + Math.random() * .004, dr: .12 + Math.random() * .35, z: Math.random(), hue: Math.random() < .78 ? 0 : 1 };
+  }
+  var mx = 0, my = 0;
+  addEventListener("pointermove", function(e){ mx = (e.clientX / innerWidth - .5); my = (e.clientY / innerHeight - .5); }, {passive:true});
+  function frame(){
+    var ox = W * (W > 760 ? .7 : .5) + mx * 40, oy = H * .5 + my * 30;
+    var bg = css("--bg"), a1 = css("--acc"), a2 = css("--acc2");
+    cx.globalCompositeOperation = "source-over";
+    cx.fillStyle = bg; cx.globalAlpha = .08; cx.fillRect(0,0,W,H); cx.globalAlpha = 1;
+    for (var i = 0; i < parts.length; i++){
+      var p = parts[i];
+      var x0 = ox + Math.cos(p.a) * p.r, y0 = oy + Math.sin(p.a) * p.r * .56;
+      var w = p.s * (1 + 260 / (p.r + 40));
+      p.a += w; p.r -= p.dr * (1 + 40 / (p.r + 20));
+      if (p.r < 6){ parts[i] = spawn(false); continue; }
+      var x1 = ox + Math.cos(p.a) * p.r, y1 = oy + Math.sin(p.a) * p.r * .56;
+      cx.strokeStyle = p.hue ? a2 : a1;
+      cx.globalAlpha = Math.min(.95, .22 + p.z * .55 + 60 / (p.r + 60));
+      cx.lineWidth = .8 + p.z * 1.4;
+      cx.beginPath(); cx.moveTo(x0, y0); cx.lineTo(x1, y1); cx.stroke();
+    }
+    cx.globalAlpha = 1;
+    if (!reduce && !document.hidden) requestAnimationFrame(frame);
+  }
+  resize(); addEventListener("resize", function(){ clearTimeout(resize._t); resize._t = setTimeout(resize, 150); });
+  if (reduce){ for (var k = 0; k < 120; k++) frame(); } else requestAnimationFrame(frame);
+  document.addEventListener("visibilitychange", function(){ if (!document.hidden && !reduce) requestAnimationFrame(frame); });
+})();
+</script>
+</body>
+</html>
