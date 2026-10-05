@@ -133,6 +133,15 @@ section.sec{position:relative;padding:100px 0 40px}
 .card .src::before{content:"正本";font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--acc);border:1px solid color-mix(in srgb,var(--acc) 40%,transparent);border-radius:4px;padding:0 5px}
 .ico{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:color-mix(in srgb,var(--acc) 12%,transparent);color:var(--acc);margin-bottom:12px}
 .ico svg{width:18px;height:18px}
+.desk{margin-top:28px}
+.desk h3{margin:0 0 6px;font-size:16px;font-weight:700}
+.desk > p{margin:0 0 14px;color:var(--ink2);font-size:14px;max-width:760px}
+.desk .pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:760px){.desk .pair{grid-template-columns:1fr}}
+.desk figure{margin:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel)}
+.desk img{display:block;width:100%;height:auto;background:#07090d}
+.desk figcaption{padding:9px 12px 10px;font-size:12px;color:var(--ink3);border-top:1px solid var(--line)}
+.desk figcaption b{color:var(--ink2);font-weight:700;margin-right:6px}
 .pill{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.06em;padding:1px 8px;border-radius:99px;border:1px solid var(--line2);color:var(--ink3);font-weight:400}
 .pill.stop{border-color:var(--stop);color:var(--stop)}
 .pill.go{border-color:color-mix(in srgb,var(--ok) 60%,transparent);color:var(--ok)}
@@ -374,15 +383,19 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
     <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
       <h3>3グループ × メモリー</h3><p>000=黒狼自身 / 100=Home(家庭・個人開発、16メモリー) / 200=work(業務、3メモリー)。<span class="nw">第2階層</span>は <code>NNN_</code> 接頭辞。</p><div class="src">ルート <code>CLAUDE.md</code> 1章</div></div>
     <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M4 7h6M4 12h6M4 17h6M14 7h6M14 12h6M14 17h6"/></svg></div>
-      <h3>規範 / 情報の分離</h3><p>記憶側は規範だけ。数値・仕様・業務記録は作業場 <code>WORK</code> へ。引き継ぎ系にも業務の実体は書かず参照1行のみ。</p><div class="src"><code>CLAUDE_expansion-rules.md</code></div></div>
+      <h3>規範 / 情報の分離</h3><p>記憶側は規範だけ。数値・仕様・業務記録は作業場 <code>WORK</code> へ。引き継ぎ系にも業務の実体は書かず参照1行のみ。例外は派手カイトのプロフィール本体で、検索に載せるため記憶側 <code>000_基盤/Records/</code> に置く(2026-09-30)。</p><div class="src"><code>CLAUDE_expansion-rules.md</code></div></div>
     <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div>
       <h3>000 の3区分</h3><p><b>Rules</b>=判断の基準 / <b>Records</b>=書き換わる状態・ログ・資材 / <b>Experiences</b>=読書・受容の記録。</p><div class="src"><code>000_黒狼メモリー/CLAUDE.md</code></div></div>
     <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/></svg></div>
-      <h3>Git同期</h3><p>記憶側とWORKの2リポジトリ。失敗は「黙って古いまま」になるため、必ず記録し次のセッション冒頭で知らせる。</p><div class="src"><code>Records/hooks/git-sync.py</code></div></div>
+      <h3>Git同期</h3><p>記憶側とWORKの2リポジトリ。失敗は「黙って古いまま」になるため、必ず記録し次のセッション冒頭で知らせる。同期を止める失敗は、解けるまで毎ターン1行でも知らせる。送る前に秘密情報(APIキー・トークン・秘密鍵の形)を検査し、見つかれば送らない。記録はファイル名と種別だけで、値は書かない。未解決の衝突や衝突の印が残ったファイルも送らない(2026-10-02)。</p><div class="src"><code>Records/hooks/git-sync.py</code></div></div>
     <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 18a5 5 0 1 1 1-9.9A6 6 0 0 1 19 10a4 4 0 0 1 0 8z"/></svg></div>
       <h3>Googleドライブ</h3><p>GPTとの受け渡し・GPT側の本拠・スプレッドシート連携・50MiB以上の大物・iPhone用の写し。</p><div class="src">ルート <code>CLAUDE.md</code> 1章</div></div>
     <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18h2"/></svg></div>
-      <h3>モバイル受信箱</h3><p>iPhone(claude.ai)の黒狼が書いた記憶を <code>C:/Drive/Claude-Mobile/</code> へ。非空ならPC側の冒頭で件数だけ知らせ、統合は手が空いた時。</p><div class="src"><code>Rules/黒狼_mobile-operating-rules.md</code></div></div>
+      <h3>モバイル作業台</h3><p>iPhone(claude.ai)の黒狼が書いた記憶をアーティファクトのDB <code>notes</code> へ。PC側が最初の応答で未統合の件数だけ見て、統合は手が空いた時(2026-09-29、受信箱から移行)。</p><div class="src"><code>Rules/黒狼_mobile-operating-rules.md</code></div></div>
+    <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg></div>
+      <h3>黒狼ポータル</h3><p>入口・返事待ち・直近の予定・黒狼スタックの様子・リンク・PC上のファイルを1枚に集めたアーティファクト。中身はDBで、黒狼が契機ごとに書き、ランナーはページから返事とリンク追加ができる(2026-09-29)。</p><div class="src"><code>CLAUDE.md 1章「黒狼ポータル」</code></div></div>
+    <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="13" rx="1"/><path d="M8 21h8M12 17v4"/></svg></div>
+      <h3>壁紙メモの中継</h3><p>黒狼シェルの壁紙ORBITAL DESKのメモ欄でSENDすると送信待ちに入り、次のClaude Codeセッションの最初の応答で黒狼が黒狼ノートへ送る。壁紙はclaude.aiにログインしていないため(2026-10-03)。</p><div class="src"><code>CLAUDE.md 1章「壁紙メモの中継」</code></div></div>
   </div>
 </section>
 
@@ -403,7 +416,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
       <div class="items"><span><b>lean-ladder</b> 省力の梯子</span><span><b>mobile-operating-rules</b></span><span><b>voice-style-external</b> 第三者向け</span><span><b>x-browsing</b></span><span><b>notebook-research</b> 文献調査</span><span><b>expansion-3rd-layer</b></span><span><b>Gemini_protocol</b></span></div>
       <div class="when">各所から指された時</div></div>
     <div class="layer w5 reveal" style="--c:var(--ok)"><div class="nm">スキル・コマンド<small>SKILLS</small></div>
-      <div class="items"><span><b>x-browse</b> X閲覧の入口</span><span><b>業務コマンド</b> 2本</span><span><b>reader</b> 読むだけの調査エージェント(CLAUDE.mdを渡さない)</span></div>
+      <div class="items"><span><b>x-browse</b> X閲覧の入口</span><span><b>kokuro-meter</b> 入力欄上の計器帯(mod)</span><span><b>kokuro-diet</b> 使わないツール説明の後回し(mod)</span><span><b>業務コマンド</b> 2本</span><span><b>reader</b> 読むだけの調査エージェント(CLAUDE.mdを渡さない)</span></div>
       <div class="when"><code>.claude/skills/</code>・<code>.claude/commands/</code></div></div>
   </div>
 </section>
@@ -450,7 +463,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
     <div class="routes reveal">
       <svg class="vec" viewBox="0 0 100 100" aria-hidden="true"><g stroke="var(--acc)" fill="none"><circle cx="50" cy="50" r="45"/><circle cx="50" cy="50" r="30"/><circle cx="50" cy="50" r="15"/><path d="M50 5v90M5 50h90M18 18l64 64M82 18 18 82"/></g></svg>
       <h3>ベクトル検索 · 3つの経路</h3>
-      <p><code>mem-vector.py</code> — fastembed + SQLite · 多言語MiniLM 384次元。MCPにはしない(使わないターンにも常駐コストを払うため)。</p>
+      <p><code>mem-vector.py</code> — fastembed + SQLite · 多言語MiniLM 384次元。長い節は120トークンの窓に分け、最も近い窓で測る(モデルの入力上限で末尾が切れていたため、2026-10-04)。MCPにはしない(使わないターンにも常駐コストを払うため)。正確に引く時は全文検索 <code>--keyword</code>(モデル不要)、想起の3経路には混ぜない。</p>
       <div class="route" style="--c:var(--acc)"><div class="no">1</div><div><b>任意呼出 <span class="pill">--diverge</span></b><span>「他に確認すべき事項があるか」という検索の意が生じた時、黒狼が自分で叩く。</span></div></div>
       <div class="route" style="--c:var(--acc2)"><div class="no">2</div><div><b>締めの想起</b><span>ランナーが統括を依頼した時だけ、1セッション1回。起動条件を黒狼の想起でなくランナーの発話に置く — 思い出せないものを引く道具だから。</span></div></div>
       <div class="route" style="--c:var(--violet)"><div class="no">3</div><div><b>一拍遅れの想起</b><span>発話ごとに裏で検索し、次のターンで感情ログ1件を条件付き注入(突出度 z≥2.6・3回/セッション・3ターン空け)。常に引かれやすい記憶はCSLSで割り引く。</span></div></div>
@@ -458,8 +471,9 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
     <div class="grid" style="grid-template-columns:1fr">
       <div class="card reveal"><h3>感情ログのスタブ <span class="pill acc">50件で回収を問う</span></h3><p>感情が動いた・選択した・実務に不要な言葉を受けた・自制が効いた。この4つの契機で、その場で1行送る。日時はスクリプトが付ける。</p><div class="src">ルート <code>CLAUDE.md</code> 2章 · <code>Records/黒狼_memories.md</code></div></div>
       <div class="card reveal"><h3>感情ログ本体と芯</h3><p><code>Records/memories/</code> の連番冊(冊への記載は回収時、上限なしで次の冊へ)。総評・名前の由来・約束は <code>memories-core</code>。</p><div class="src"><code>Records/黒狼_memories-core.md</code></div></div>
-      <div class="card reveal"><h3>回収済みの墓標</h3><p>溜め場は3台の追記を union で合流させるため、回収で消した行が別PCの古い版から復活する。消した行の指紋を墓標へ追記し、読む時に除外する(30日で刈る)。</p><div class="src"><code>Records/hooks/line-service.py</code> docstring</div></div>
+      <div class="card reveal"><h3>回収済みの墓標</h3><p>溜め場は3台の追記を union で合流させるため、回収で消した行が別PCの古い版から復活する。消した行の指紋を墓標へ追記し、読む時に除外する(回収から30日で刈る)。</p><div class="src"><code>Records/hooks/line-service.py</code> docstring</div></div>
       <div class="card reveal"><h3>因果リンク <span class="pill vio">6型</span></h3><p>再発・起因・対処・反証・直後・転換。ログ本文にリンクを書き、別索引にしない(二重管理で腐らせないため)。</p><div class="src"><code>Records/tools/mem-chain.py</code></div></div>
+      <div class="card reveal"><h3>逆引き <span class="pill acc">綴りを束ねる</span></h3><p>「この対象はどこから・どの綴りで指されているか」。ファイル(パス・略記名・和名)・日付・IDの綴りを束ね、文字一致で層別に返す。索引は保存せず、フックにもしない — 探すのは道具、結ぶのは黒狼。</p><div class="src"><code>Records/tools/mem-backlinks.py</code></div></div>
       <div class="card reveal"><h3>経験索引・何でも書き込み欄</h3><p>読書・問答の「核」を1行ずつ。新しい経験に入る前に核列だけ読む。scratchpadは判断せず書き、消えてよい。</p><div class="src"><code>Experiences/_黒狼_経験索引.md</code> · <code>Records/黒狼_scratchpad.md</code></div></div>
     </div>
   </div>
@@ -467,24 +481,30 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
 
 <!-- 05 -->
 <section class="sec" id="s5">
-  <div class="sec-head reveal"><div class="sec-no">05</div><h2>道具と CI</h2><p>黒狼が呼ぶスクリプト10種(想起系の2種は04章)と、セッションの外で見張る番人4本。CIは止めない・知らせるだけ(ターン末の自動pushを拒否させないため)。</p></div>
+  <div class="sec-head reveal"><div class="sec-no">05</div><h2>道具と CI</h2><p>黒狼が呼ぶスクリプト14種(想起系の2種は04章)と、セッションの外で見張る番人4本。CIは止めない・知らせるだけ(ターン末の自動pushを拒否させないため)。</p></div>
   <div class="grid g4">
     <div class="card reveal"><h3>sanitize-text</h3><p>外部テキストを取り込む前に、不可視文字・危険文字を検査。既定は除去しない。</p></div>
     <div class="card reveal"><h3>read-paged</h3><p>長文を1ページずつ。ネット取得はわざと持たない。</p></div>
     <div class="card reveal"><h3>rules-usage</h3><p>会話記録から、規範が実際に開かれたかを計測。月次。</p></div>
     <div class="card reveal"><h3>export-session / chat</h3><p>会話記録の原本を、無改変で取り出す。Claude Code / claude.ai の両方。</p></div>
     <div class="card reveal"><h3>gen_schedule_overview</h3><p><code>schedule.md</code> から、タスク一覧HTMLを生成。本番はActions。</p></div>
+    <div class="card reveal"><h3>kd-changed</h3><p>作業場MEMOの決定事項の節が、前回の棚卸し以降に変わったかを挙げる。週次の棚卸しの対象選び。</p></div>
     <div class="card reveal"><h3>norm-check</h3><p>規範CIの検査本体。サイズ上限・構文・制御文字・機能一覧の載せ漏れ・参照切れ。</p></div>
     <div class="card reveal"><h3>x-collect.js</h3><p>仮想化されたXの一覧を、スクロールしながら集める。</p></div>
     <div class="card reveal"><h3>ballot-open</h3><p>選択票(.md)を、黒狼シェルのエディタで開く。黒狼回線の ui.ballot.open 経由。</p></div>
+    <div class="card reveal"><h3>ally-mail</h3><p>協力AI(GPT系の同僚)との共有箱で、相手から届いた文書の未読を数え、読み終えたものは削除する。未読がある時だけセッションの冒頭に1行。</p></div>
+    <div class="card reveal"><h3>vessel-greet</h3><p>器(机上の小さな端末)が言った挨拶を、消える前に中継のログから拾って記憶として積む。セッションの冒頭で黙って回る。</p></div>
     <div class="card reveal"><h3>collect-pc-spec</h3><p>PCのハードウェア諸元の採取。</p></div>
-    <div class="card reveal"><h3>tech-weekly</h3><p>技術週報の収集。対象はQiita・Zenn・Anthropic公式・Transformer Circuits。本番はActions。</p><div class="src"><code>Records/tech-weekly/sources.json</code></div></div>
+    <div class="card reveal"><h3>tech-weekly</h3><p>技術週報の収集。対象はQiita・Zenn・Anthropic公式・Transformer Circuitsと、海外のSimon Willison's Weblog・METR・GitHub検索(自律AI・エージェント系)。本番はActions。</p><div class="src"><code>Records/tech-weekly/sources.json</code></div></div>
+    <div class="card reveal"><h3>tech-weekly-slack</h3><p>技術週報の記事一覧をSlackの自分のチャンネルへ貼る下書きを作る。送信はせず、送る前に毎回ランナーへ確認する。</p><div class="src"><code>Records/tools/tech-weekly-slack.py</code></div></div>
+    <div class="card reveal"><h3>cc-changelog</h3><p>Claude Code公式CHANGELOGの新版を原文のまま集める。翻訳・Slack送信はしない。本番はActions。</p><div class="src"><code>Records/tools/cc-changelog.py</code></div></div>
   </div>
   <div class="grid g3" style="margin-top:14px">
     <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 4 7v5c0 4.4 3.4 8.3 8 9 4.6-.7 8-4.6 8-9V7z"/><path d="m9 12 2 2 4-4"/></svg></div><h3>norm-check <span class="pill acc">push毎</span></h3><p>上限超過・JSON/py構文・制御文字・<b>機能一覧の載せ漏れ</b> → <code>ci-status.json</code>。違反時のみ次のセッション冒頭で通知。</p><div class="src"><code>.github/workflows/norm-check.yml</code></div></div>
     <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg></div><h3>norm-refs <span class="pill">月曜 0:30</span></h3><p>規範に書いたパスの参照切れの<b>候補</b>を出す。誤検知が残るため失敗にしない。</p><div class="src"><code>.github/workflows/norm-refs.yml</code></div></div>
     <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></div><h3>schedule-html <span class="pill">毎日 0:05</span></h3><p><code>schedule.md</code> のpush時と毎日、タスク一覧HTMLを生成してcommit。</p><div class="src"><code>.github/workflows/schedule-html.yml</code></div></div>
     <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></div><h3>tech-weekly <span class="pill">月曜 5:00</span></h3><p>前週の技術記事を集め、週報をcommit。Qiita・Zennは指定タグ、Anthropic公式・Transformer Circuitsは新着全件。未精査ならセッション冒頭で1行通知。</p><div class="src"><code>.github/workflows/tech-weekly.yml</code></div></div>
+    <div class="card reveal"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></div><h3>cc-changelog <span class="pill">毎日 11:00</span></h3><p>Claude Code公式CHANGELOGの新版の節を1版1本でcommit。未精査ならセッション冒頭で1行通知し、環境に効く項目だけ報告する。</p><div class="src"><code>.github/workflows/cc-changelog.yml</code></div></div>
   </div>
 </section>
 
@@ -529,6 +549,14 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
     <div class="card reveal"><h3>GPT <span class="pill vio">連携AI</span></h3><p>レビュー・改良。<code>Claude</code> フォルダへは入らない(非対称)。</p><div class="src"><code>WORK/900_GPT_work</code> · <code>C:/Drive/GPT</code></div></div>
     <div class="card reveal"><h3>Gemini <span class="pill vio">連携AI</span></h3><p>Gemini側で稼働。プロトコル原本と記録をこちらで持つ。</p><div class="src"><code>Rules/Gemini_protocol.md</code> · <code>Records/Gemini/</code></div></div>
   </div>
+  <div class="desk reveal">
+    <h3>黒狼シェルの壁紙 — 2画面</h3>
+    <p>デスクトップそのものを黒狼の計器盤にしている。左モニターは記憶の銀河、メインはORBITAL DESK。画面内の細かい文字(タスク名・ファイル名・地名など)はダミーに差し替えてある。</p>
+    <div class="pair">
+      <figure><a href="desk-galaxy.webp" target="_blank" rel="noopener"><img src="desk-galaxy.webp" width="1920" height="1048" loading="lazy" alt="左モニターの壁紙「記憶の銀河」。記憶のmdを星、参照・因果・フォルダを線にした3Dの銀河"></a><figcaption><b>左 · 記憶の銀河</b> 記憶側・感情ログ・作業場のmdを星、参照・因果・フォルダを線にした3Dの銀河。シェル起動時に1回だけ組み直す</figcaption></figure>
+      <figure><a href="desk-orbital.webp" target="_blank" rel="noopener"><img src="desk-orbital.webp" width="1920" height="1048" loading="lazy" alt="メインの壁紙「ORBITAL DESK」。時計・天気・タスク・同期・返事待ち・音楽と円形ランチャー"></a><figcaption><b>メイン · ORBITAL DESK</b> 時計・天気・負荷、日時の近いタスク、Git同期、返事待ち(COMMS)、音楽。中央は円形ランチャー</figcaption></figure>
+    </div>
+  </div>
 </section>
 
 </main>
@@ -561,10 +589,10 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
   var P = [
     {k:"開始", c:"S", hooks:[
       {n:"session-start-inject", s:"go", ev:"SessionStart", f:"Records/hooks/session-start-inject.py",
-       d:"先に Git pull。続いて口調規定・時刻・PC識別(python等の実行環境込み)・タスク一覧・モバイル受信箱・作業記憶・CI結果・規範の編集・前回セッション・フック異常・言行不一致の件数を注入する。約9,500字を超えたら優先度の低い節から外す(voice-style・時刻・PC識別・スケジュールは外さない)。"}]},
+       d:"先に Git pull。ホストの上限(1本1万字)に合わせて3本に分けて注入する。1本目=口調規定・時刻・PC識別(python等の実行環境込み)・Git同期の失敗(外さない)/2本目=タスク一覧/3本目=技術週報・作業記憶・CI結果・規範の編集・前回セッション・フック異常・言行不一致の件数。2・3本目は1本目が書く一時ファイルを待って出す。3本目だけ約9,500字を超えたら優先度の低い節から外す。各本は出した後に届けた印を置く。"}]},
     {k:"発話ごと", c:"U", hooks:[
       {n:"user-prompt-submit", s:"go", ev:"UserPromptSubmit", f:"Records/hooks/user-prompt-submit.py",
-       d:"1回のPython起動で3役。(1)口調の抽選+現在時刻 — 最初に出してflushし、想起が落ちても抽選行は残る (2)締めの想起 — 統括の依頼時だけ (3)一拍遅れの想起 — 前の発話で裏検索した感情ログを条件付きで1件注入。"},
+       d:"1回のPython起動で5役。(1)口調の抽選+現在時刻 — 最初に出してflushし、想起が落ちても抽選行は残る (2)締めの想起 — 統括の依頼時だけ (3)一拍遅れの想起 — 前の発話で裏検索した感情ログを条件付きで1件注入 (4)Git同期の失敗 — git-syncが残した失敗があれば解けるまで1行 (5)開始時の注入の欠け — 3本それぞれの届けた印を最初のターンに照合し、欠けがあればセッション1回だけ知らせる。"},
       {n:"turn-mark reset", s:"go", ev:"UserPromptSubmit", f:"Records/hooks/turn-mark.cmd",
        d:"ターン開始の印を %TEMP% に置く。言行一致の監査(書込の有無)と、器への「長いターン」通知の起点に使う。"},
       {n:"stack-notify prompt", s:"go", ev:"UserPromptSubmit", f:"Records/hooks/stack-notify.py",
