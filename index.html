@@ -78,6 +78,10 @@ header.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px) saturate(
 /* hero */
 .hero{position:relative;min-height:88vh;display:flex;align-items:center;overflow:hidden;border-bottom:1px solid var(--line)}
 #vortex{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+#galaxy{position:absolute;inset:0;width:100%;height:100%;z-index:0;display:none}
+/* ダークでは記憶の銀河(galaxy-hero.js)、ライトと銀河が動かない環境では渦 */
+:root[data-galaxy="on"]:not([data-theme="light"]) #galaxy{display:block}
+:root[data-galaxy="on"]:not([data-theme="light"]) #vortex{display:none}
 .hero::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 70% 50%,transparent 35%,var(--bg) 92%),linear-gradient(90deg,var(--bg) 0%,color-mix(in srgb,var(--bg) 55%,transparent) 38%,transparent 60%);pointer-events:none}
 .hero .wrap{z-index:2;padding-top:40px;padding-bottom:60px}
 .eyebrow{font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.28em;color:var(--acc);display:flex;align-items:center;gap:10px}
@@ -573,6 +577,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
     var cur = root.getAttribute("data-theme") || "dark";
     var nx = cur === "light" ? "dark" : "light";
     root.setAttribute("data-theme", nx);
+    document.dispatchEvent(new Event("kokuro-theme"));
     try { localStorage.setItem("kokuro-map-theme", nx); } catch(e){}
   });
 
@@ -808,7 +813,15 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
   }
   var mx = 0, my = 0;
   addEventListener("pointermove", function(e){ mx = (e.clientX / innerWidth - .5); my = (e.clientY / innerHeight - .5); }, {passive:true});
+  var vRun = false;
+  function owned(){ return root.getAttribute("data-galaxy") === "on" && root.getAttribute("data-theme") !== "light"; }
+  function start(){
+    if (vRun || owned() || document.hidden) return;
+    if (reduce){ for (var k = 0; k < 120; k++) frame(); return; }
+    vRun = true; requestAnimationFrame(frame);
+  }
   function frame(){
+    if (owned()){ vRun = false; return; }
     var ox = W * (W > 760 ? .7 : .5) + mx * 40, oy = H * .5 + my * 30;
     var bg = css("--bg"), a1 = css("--acc"), a2 = css("--acc2");
     cx.globalCompositeOperation = "source-over";
@@ -826,12 +839,16 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
       cx.beginPath(); cx.moveTo(x0, y0); cx.lineTo(x1, y1); cx.stroke();
     }
     cx.globalAlpha = 1;
-    if (!reduce && !document.hidden) requestAnimationFrame(frame);
+    if (!reduce && !document.hidden) requestAnimationFrame(frame); else vRun = false;
   }
   resize(); addEventListener("resize", function(){ clearTimeout(resize._t); resize._t = setTimeout(resize, 150); });
-  if (reduce){ for (var k = 0; k < 120; k++) frame(); } else requestAnimationFrame(frame);
-  document.addEventListener("visibilitychange", function(){ if (!document.hidden && !reduce) requestAnimationFrame(frame); });
+  start();
+  document.addEventListener("visibilitychange", start);
+  document.addEventListener("kokuro-theme", start);
 })();
 </script>
+<!-- 記憶の銀河: データ(座標と数字だけ)と描画(three.js同梱)。作り方=sns-publish/build-galaxy.mjs -->
+<script src="galaxy-data.js" defer></script>
+<script src="galaxy-hero.js" defer></script>
 </body>
 </html>
