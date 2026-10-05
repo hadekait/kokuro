@@ -16,33 +16,24 @@
 <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#07090d; --bg2:#0c1017; --panel:#10151e; --panel2:#151c28; --line:#1f2835; --line2:#2a3647;
-  --ink:#e7edf5; --ink2:#a9b6c7; --ink3:#6b7a8f;
-  --acc:#5ee6d0; --acc2:#3aa6ff; --warn:#f5b94a; --stop:#ff5d6c; --ok:#7ee787; --violet:#b69cff;
-  --glow:0 0 0 1px rgba(94,230,208,.25), 0 10px 40px -10px rgba(94,230,208,.25);
-  --grid:rgba(94,230,208,.045);
+  /* 配色=黒狼シェルの壁紙ORBITAL DESKの延長(2026-10-05、派手カイト依頼)。主=オレンジ、副=くすんだシアン */
+  --bg:#0a0f15; --bg2:#0d141b; --panel:#0f171f; --panel2:#131d27; --line:#1d2a35; --line2:#2b3d4a;
+  --ink:#e4e9ed; --ink2:#a8b4bc; --ink3:#6b7b86;
+  --acc:#ee6a36; --acc2:#6fb3c6; --warn:#efc650; --stop:#ff5d6c; --ok:#7ee787; --violet:#b69cff;
+  --glow:0 0 0 1px rgba(238,106,54,.28), 0 10px 40px -10px rgba(238,106,54,.28);
+  --grid:rgba(111,179,198,.045);
   --shadow:0 20px 60px -20px rgba(0,0,0,.7);
   color-scheme:dark;
 }
+/* 初期はダーク固定(OSのライト設定に追従しない)。ライトはボタンで選んだ時だけ */
 :root[data-theme="light"]{
-  --bg:#f3f5f8; --bg2:#e9edf2; --panel:#ffffff; --panel2:#f6f8fb; --line:#dde3ea; --line2:#c9d2dd;
-  --ink:#0f1722; --ink2:#3b4a5c; --ink3:#6c7b8e;
-  --acc:#0b9e8a; --acc2:#1f6fd1; --warn:#b97800; --stop:#d62f45; --ok:#2b8a3e; --violet:#6b4fd6;
-  --glow:0 0 0 1px rgba(11,158,138,.25), 0 10px 30px -12px rgba(11,158,138,.25);
-  --grid:rgba(15,23,34,.045);
-  --shadow:0 18px 40px -22px rgba(15,23,34,.35);
+  --bg:#f4f5f6; --bg2:#eaedf0; --panel:#ffffff; --panel2:#f7f8f9; --line:#dde2e6; --line2:#c8d0d6;
+  --ink:#121a21; --ink2:#3c4a55; --ink3:#6c7a85;
+  --acc:#c9501e; --acc2:#2b7f98; --warn:#a67c00; --stop:#d62f45; --ok:#2b8a3e; --violet:#6b4fd6;
+  --glow:0 0 0 1px rgba(201,80,30,.25), 0 10px 30px -12px rgba(201,80,30,.25);
+  --grid:rgba(18,26,33,.045);
+  --shadow:0 18px 40px -22px rgba(18,26,33,.35);
   color-scheme:light;
-}
-@media (prefers-color-scheme: light){
-  :root:not([data-theme="dark"]){
-    --bg:#f3f5f8; --bg2:#e9edf2; --panel:#ffffff; --panel2:#f6f8fb; --line:#dde3ea; --line2:#c9d2dd;
-    --ink:#0f1722; --ink2:#3b4a5c; --ink3:#6c7b8e;
-    --acc:#0b9e8a; --acc2:#1f6fd1; --warn:#b97800; --stop:#d62f45; --ok:#2b8a3e; --violet:#6b4fd6;
-    --glow:0 0 0 1px rgba(11,158,138,.25), 0 10px 30px -12px rgba(11,158,138,.25);
-    --grid:rgba(15,23,34,.045);
-    --shadow:0 18px 40px -22px rgba(15,23,34,.35);
-    color-scheme:light;
-  }
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:76px}
@@ -92,7 +83,7 @@ header.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px) saturate(
 .eyebrow{font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.28em;color:var(--acc);display:flex;align-items:center;gap:10px}
 .eyebrow::before{content:"";width:28px;height:1px;background:var(--acc)}
 h1{font-size:clamp(44px,8.4vw,112px);line-height:1.02;margin:18px 0 14px;font-weight:900;letter-spacing:-.01em}
-h1 .grad{background:linear-gradient(100deg,var(--ink) 0%,var(--acc) 55%,var(--acc2) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+h1 .grad{background:linear-gradient(100deg,var(--ink) 0%,var(--acc) 55%,color-mix(in srgb,var(--acc) 72%,#7a1f0a) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
 .lede{max-width:640px;color:var(--ink2);font-size:clamp(15px,1.6vw,18px)}
 .lede,.quote{word-break:keep-all;overflow-wrap:anywhere}
 .lede b{color:var(--ink)}
@@ -139,7 +130,7 @@ section.sec{position:relative;padding:100px 0 40px}
 .desk .pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media (max-width:760px){.desk .pair{grid-template-columns:1fr}}
 .desk figure{margin:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel)}
-.desk img{display:block;width:100%;height:auto;background:#07090d}
+.desk img{display:block;width:100%;height:auto;background:#0a0f15}
 .desk figcaption{padding:9px 12px 10px;font-size:12px;color:var(--ink3);border-top:1px solid var(--line)}
 .desk figcaption b{color:var(--ink2);font-weight:700;margin-right:6px}
 .pill{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.06em;padding:1px 8px;border-radius:99px;border:1px solid var(--line2);color:var(--ink3);font-weight:400}
@@ -579,7 +570,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
   var root = document.documentElement;
   try { var t = localStorage.getItem("kokuro-map-theme"); if (t) root.setAttribute("data-theme", t); } catch(e){}
   document.getElementById("theme").addEventListener("click", function(){
-    var cur = root.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+    var cur = root.getAttribute("data-theme") || "dark";
     var nx = cur === "light" ? "dark" : "light";
     root.setAttribute("data-theme", nx);
     try { localStorage.setItem("kokuro-map-theme", nx); } catch(e){}
